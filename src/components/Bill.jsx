@@ -31,8 +31,8 @@ const Bill = ({ bookingId }) => {
     setIsEditing(false);
   };
 
-  const grandTotal = (Number(invoice.totalAmount) || 0) + (Number(invoice.tax) || 0) - (Number(invoice.discount) || 0);
-
+  const grandTotal = (Number(invoice.totalAmount) || 0) - (Number(invoice.discount) || 0);
+// (Number(invoice.tax) || 0)
   const billRef = useRef();
   const handlePrint = () => {
     if (billRef.current) {

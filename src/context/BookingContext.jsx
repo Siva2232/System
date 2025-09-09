@@ -73,7 +73,7 @@ export const BookingProvider = ({ children }) => {
     number: i + 1,
     booked: false,
     type: i < 5 ? "Standard" : i < 10 ? "Deluxe" : "Suite",
-    rate: i < 5 ? 2500 : i < 10 ? 3500 : 5000,
+    rate: i < 5 ? 999 : i < 10 ? 2499 : 3499,
   }));
 
   const [rooms, setRooms] = useState(totalRooms);

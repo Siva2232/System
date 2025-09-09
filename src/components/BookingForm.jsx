@@ -1,42 +1,49 @@
 import React, { useState, useEffect, useContext } from "react";
 import { BookingContext } from "../context/BookingContext";
-import { Calendar, User, Phone, CreditCard, Upload, Hotel, Check, X } from "lucide-react";
+import { Calendar, User, Phone, CreditCard, Upload, Hotel, Check, X, Mail } from "lucide-react";
 
 const BookingForm = () => {
-  const { rooms, addBooking } = useContext(BookingContext); // Access context
+  const { rooms, addBooking } = useContext(BookingContext);
 
   const [form, setForm] = useState({
     name: "",
+    email: "", // Added email field
     phone: "",
     aadhaar: "",
     checkIn: "",
     checkOut: "",
     roomType: "Standard",
     roomNumber: "",
-    roomRate: 2500, // Default to Standard rate
+    roomRate: 999, // Default to Standard rate
+    tax: 0, // Added tax field for GST
     document: null,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // Update roomRate when roomType changes
+  // Update roomRate and tax when roomType or nights change
   useEffect(() => {
     const roomRates = {
-      Standard: 2500,
-      Deluxe: 3500,
-      Suite: 5000,
+      Standard: 999,
+      Deluxe: 2499,
+      Suite: 3499,
     };
+    const nights = calculateNights();
+    const baseRate = roomRates[form.roomType];
+    const tax = nights > 0 ? (baseRate * nights * 0.12).toFixed(2) : 0; // 12% GST
     setForm((prev) => ({
       ...prev,
-      roomRate: roomRates[form.roomType],
+      roomRate: baseRate,
+      tax: tax, // Update tax based on total amount
       roomNumber: "", // Reset roomNumber when roomType changes
     }));
-  }, [form.roomType]);
+  }, [form.roomType, form.checkIn, form.checkOut]);
 
   const validateForm = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
+    if (!form.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) newErrors.email = "Enter a valid email address";
     if (!form.phone.match(/^\d{10}$/)) newErrors.phone = "Enter a valid 10-digit phone number";
     if (!form.aadhaar.match(/^\d{12}$/)) newErrors.aadhaar = "Enter a valid 12-digit Aadhaar number";
     if (!form.checkIn) newErrors.checkIn = "Check-in date is required";
@@ -70,8 +77,17 @@ const BookingForm = () => {
     setIsSubmitting(true);
     setErrors({});
 
+    // Prepare booking data for context
+    const bookingData = {
+      ...form,
+      totalAmount: form.roomRate * calculateNights(),
+      nights: calculateNights(),
+      createdAt: new Date().toISOString().split("T")[0],
+      status: "Confirmed",
+    };
+
     // Submit booking to context
-    addBooking(form);
+    addBooking(bookingData);
 
     // Simulate API call
     setTimeout(() => {
@@ -83,13 +99,15 @@ const BookingForm = () => {
         setShowSuccess(false);
         setForm({
           name: "",
+          email: "",
           phone: "",
           aadhaar: "",
           checkIn: "",
           checkOut: "",
           roomType: "Standard",
           roomNumber: "",
-          roomRate: 2500, // Reset to Standard rate
+          roomRate: 999, // Reset to Standard rate
+          tax: 0,
           document: null,
         });
         setErrors({});
@@ -173,7 +191,31 @@ const BookingForm = () => {
                   </p>
                 )}
               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  <input
+                    name="email"
+                    type="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+                      errors.email ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
+                    }`}
+                  />
+                </div>
+                {errors.email && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <X className="h-4 w-4 mr-1" />
+                    {errors.email}
+                  </p>
+                )}
+              </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
                 <div className="relative">
@@ -197,30 +239,30 @@ const BookingForm = () => {
                   </p>
                 )}
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Aadhaar Number *</label>
-              <div className="relative">
-                <CreditCard className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
-                <input
-                  name="aadhaar"
-                  type="text"
-                  value={form.aadhaar}
-                  onChange={handleChange}
-                  placeholder="12-digit Aadhaar number"
-                  className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
-                    errors.aadhaar ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
-                  }`}
-                  maxLength="12"
-                />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Aadhaar Number *</label>
+                <div className="relative">
+                  <CreditCard className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+                  <input
+                    name="aadhaar"
+                    type="text"
+                    value={form.aadhaar}
+                    onChange={handleChange}
+                    placeholder="12-digit Aadhaar number"
+                    className={`w-full pl-10 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 ${
+                      errors.aadhaar ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"
+                    }`}
+                    maxLength="12"
+                  />
+                </div>
+                {errors.aadhaar && (
+                  <p className="mt-2 text-sm text-red-600 flex items-center">
+                    <X className="h-4 w-4 mr-1" />
+                    {errors.aadhaar}
+                  </p>
+                )}
               </div>
-              {errors.aadhaar && (
-                <p className="mt-2 text-sm text-red-600 flex items-center">
-                  <X className="h-4 w-4 mr-1" />
-                  {errors.aadhaar}
-                </p>
-              )}
             </div>
           </div>
 
@@ -282,9 +324,9 @@ const BookingForm = () => {
                   onChange={handleChange}
                   className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 border-gray-300 hover:border-gray-400 bg-white"
                 >
-                  <option value="Standard">Standard Room - ₹2,500/night</option>
-                  <option value="Deluxe">Deluxe Room - ₹3,500/night</option>
-                  <option value="Suite">Suite - ₹5,000/night</option>
+                  <option value="Standard">Standard Room - ₹999/night</option>
+                  <option value="Deluxe">Deluxe Room - ₹2499/night</option>
+                  <option value="Suite">Suite - ₹3499/night</option>
                 </select>
               </div>
 
@@ -351,9 +393,13 @@ const BookingForm = () => {
                   <span className="text-gray-600">Rate per night:</span>
                   <span className="font-medium text-gray-900">₹{form.roomRate.toLocaleString()}</span>
                 </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600">GST (12%):</span>
+                  <span className="font-medium text-blue-600">₹{Number(form.tax).toLocaleString()}</span>
+                </div>
                 <div className="border-t border-blue-200 pt-3">
                   <div className="flex justify-between">
-                    <span className="text-lg font-semibold text-gray-900">Total Amount:</span>
+                    <span className="text-lg font-semibold text-gray-900">Total Amount (Excl. GST):</span>
                     <span className="text-xl font-bold text-blue-600">₹{totalAmount.toLocaleString()}</span>
                   </div>
                 </div>

@@ -1,6 +1,6 @@
 import React, { useContext, useState, useMemo } from "react";
-import { BookingContext } from "../context/BookingContext" // Import the real BookingContext
-import { Search, Download, Eye, X, Calendar, Phone, CreditCard, Home, DollarSign, FileText, LogOut } from "lucide-react";
+import { BookingContext } from "../context/BookingContext"; // Import the real BookingContext
+import { Search, Download, Eye, X, Calendar, Phone, CreditCard, Home, DollarSign, FileText, LogOut, Mail } from "lucide-react";
 
 const BookingList = () => {
   const { bookings, releaseRoom } = useContext(BookingContext); // Use real context
@@ -39,7 +39,7 @@ const BookingList = () => {
 
   const filteredAndSortedBookings = useMemo(() => {
     let filtered = bookings.filter((b) => {
-      const matchesSearch = [b.name, b.phone, b.aadhaar, b.roomType, b.roomNumber]
+      const matchesSearch = [b.name, b.email, b.phone, b.aadhaar, b.roomType, b.roomNumber]
         .join(" ")
         .toLowerCase()
         .includes(search.toLowerCase());
@@ -114,7 +114,7 @@ const BookingList = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search by name, phone, Aadhaar, or room..."
+                placeholder="Search by name, email, phone, Aadhaar, or room..."
                 className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -129,10 +129,7 @@ const BookingList = () => {
                 className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               >
                 <option value="all">All Status</option>
-                {/* <option value="pending">Pending</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="checked-in">Checked In</option> */}
-                <option value="Booked">Booked</option> {/* Added to support BookingProvider status */}
+                <option value="Booked">Booked</option>
               </select>
             </div>
           </div>
@@ -217,6 +214,10 @@ const BookingList = () => {
                         <div className="space-y-1">
                           <div className="font-semibold text-slate-900">{booking.name}</div>
                           <div className="flex items-center gap-2 text-sm text-slate-600">
+                            <Mail className="w-3 h-3" />
+                            <span>{booking.email || "N/A"}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-slate-600">
                             <Phone className="w-3 h-3" />
                             <span>{booking.phone}</span>
                           </div>
@@ -243,8 +244,12 @@ const BookingList = () => {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="font-semibold text-slate-900">₹{booking.roomRate.toLocaleString()}</div>
-                        <div className="text-xs text-slate-500">per night</div>
+                        <div className="space-y-1">
+                          <div className="font-semibold text-slate-900">₹{booking.roomRate.toLocaleString()}</div>
+                          <div className="text-xs text-slate-500">per night</div>
+                          <div className="text-sm text-blue-600">Total: ₹{Number(booking.totalAmount || 0).toLocaleString()}</div>
+                          <div className="text-sm text-blue-600">GST: ₹{Number(booking.tax || 0).toLocaleString()}</div>
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         {booking.document ? (

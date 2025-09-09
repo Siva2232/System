@@ -156,19 +156,25 @@ const Dashboard = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <button className="flex items-center justify-center p-3 sm:p-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors duration-200 border border-blue-200 text-sm sm:text-base">
               <FaUsers className="mr-2 text-blue-600" />
+              <a href="/crm/add-booking">
               <span className="text-blue-700 font-medium">New Booking</span>
+              </a>
             </button>
             <button className="flex items-center justify-center p-3 sm:p-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors duration-200 border border-green-200 text-sm sm:text-base">
               <FaCheck className="mr-2 text-green-600" />
+              <a href="/crm/bookings">
               <span className="text-green-700 font-medium">Check-in</span>
+              </a>
             </button>
-            <button className="flex items-center justify-center p-3 sm:p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 border border-purple-200 text-sm sm:text-base">
+            {/* <button className="flex items-center justify-center p-3 sm:p-4 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors duration-200 border border-purple-200 text-sm sm:text-base">
               <FaCalendarAlt className="mr-2 text-purple-600" />
               <span className="text-purple-700 font-medium">Schedule</span>
-            </button>
+            </button> */}
             <button className="flex items-center justify-center p-3 sm:p-4 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors duration-200 border border-amber-200 text-sm sm:text-base">
               <FaChartLine className="mr-2 text-amber-600" />
+              <a href="/crm/reports">
               <span className="text-amber-700 font-medium">Reports</span>
+              </a>
             </button>
           </div>
         </div>

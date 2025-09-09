@@ -15,8 +15,10 @@ import Login from "../pages/Login";
 import Dashboard from "../crm/Dashboard";
 import AddBooking from "../crm/AddBooking";
 import Bookings from "../crm/Bookings";
+
 import Reports from "../crm/Reports";
 import Rooms from "../crm/Rooms";
+import BookingList from "../crm/BookingList";
 
 export const router = createBrowserRouter([
   { path: "/", element: <Login /> },
@@ -28,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "dashboard", element: <Dashboard /> },
       { path: "rooms", element: <Rooms /> },   // ✅ fixed
       { path: "add-booking", element: <AddBooking /> },
+      { path: "bill", element: <BookingList /> },
       { path: "bookings", element: <Bookings /> },
       { path: "reports", element: <Reports /> },
     ],

@@ -68,18 +68,20 @@ export const BookingProvider = ({ children }) => {
     Suite: 5000,
   };
 
+  // Create 15 rooms with types & rates
   const totalRooms = Array.from({ length: 15 }, (_, i) => ({
     number: i + 1,
     booked: false,
     type: i < 5 ? "Standard" : i < 10 ? "Deluxe" : "Suite",
-    rate: i < 5 ? 2500 : i < 10 ? 3500 : 5000, // Add rate to rooms
+    rate: i < 5 ? 2500 : i < 10 ? 3500 : 5000,
   }));
 
   const [rooms, setRooms] = useState(totalRooms);
   const [bookings, setBookings] = useState([]);
 
+  // ➕ Add a new booking
   const addBooking = (booking) => {
-    // Convert roomNumber to number, because form gives string
+    // Find room
     const selectedRoom = rooms.find(
       (r) => r.number === Number(booking.roomNumber) && !r.booked
     );
@@ -89,18 +91,24 @@ export const BookingProvider = ({ children }) => {
       return;
     }
 
-    // Calculate totalAmount based on stay duration and room rate
+    // Nights calculation
     const checkInDate = new Date(booking.checkIn);
     const checkOutDate = new Date(booking.checkOut);
-    const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
-    const totalAmount = nights * (selectedRoom.rate || roomRates[selectedRoom.type]);
+    const nights = Math.ceil(
+      (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
+    );
 
-    // Create booking with all required properties
+    // Room rate & total
+    const rate = selectedRoom.rate || roomRates[selectedRoom.type];
+    const totalAmount = nights * rate;
+
+    // New booking with invoice fields
     const newBooking = {
       id: bookings.length + 1,
       roomNumber: selectedRoom.number,
       roomType: selectedRoom.type,
-      roomRate: selectedRoom.rate || roomRates[selectedRoom.type],
+      roomRate: rate,
+      nights,
       totalAmount,
       name: booking.name || "Unknown Guest",
       phone: booking.phone || "N/A",
@@ -110,6 +118,12 @@ export const BookingProvider = ({ children }) => {
       status: booking.status || "Booked",
       document: booking.document || null,
       rating: booking.rating || 0,
+
+      // Invoice fields
+      tax: Math.round(totalAmount * 0.12), // 12% GST
+      discount: 0,
+      paymentMode: "Cash",
+      createdAt: new Date().toLocaleString(),
     };
 
     // Mark the room as booked
@@ -123,6 +137,7 @@ export const BookingProvider = ({ children }) => {
     setBookings((prev) => [...prev, newBooking]);
   };
 
+  // 🔓 Release room and remove booking
   const releaseRoom = (roomNumber) => {
     setRooms((prev) =>
       prev.map((r) =>
@@ -134,7 +149,12 @@ export const BookingProvider = ({ children }) => {
 
   return (
     <BookingContext.Provider
-      value={{ rooms, bookings, addBooking, releaseRoom }}
+      value={{
+        rooms,
+        bookings,
+        addBooking,
+        releaseRoom,
+      }}
     >
       {children}
     </BookingContext.Provider>

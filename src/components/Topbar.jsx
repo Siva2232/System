@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch, FaBell, FaUserCircle, FaMicrophone, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Topbar = () => {
   const [searchFocused, setSearchFocused] = useState(false);
@@ -7,6 +8,7 @@ const Topbar = () => {
   const [notificationCount, setNotificationCount] = useState(3);
   const [isListening, setIsListening] = useState(false);
   const [time, setTime] = useState(new Date());
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -28,27 +30,17 @@ const Topbar = () => {
     setSearchFocused(false);
   };
 
+  const handleSignOut = () => {
+    // clear auth tokens or user data
+    localStorage.removeItem("user"); 
+    // navigate to login page
+    navigate("/login");
+  };
+
   return (
     <div className="h-20 bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 shadow-2xl flex items-center justify-between px-8 relative overflow-visible">
-      {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 bg-purple-400 rounded-full opacity-30 animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Left section */}
+      {/* Logo + Search */}
       <div className="flex items-center gap-6 z-10">
-        {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl flex items-center justify-center transform hover:rotate-12 transition-all duration-300 shadow-lg">
             <span className="text-white font-bold text-lg"></span>
@@ -57,14 +49,15 @@ const Topbar = () => {
             Hotel CRM
           </span>
         </div>
-
         {/* Search Bar */}
-        <div className={`relative transition-all duration-500 ${searchFocused ? 'w-96' : 'w-80'}`}>
-          <div className={`relative bg-white/10 backdrop-blur-xl rounded-2xl border transition-all duration-300 ${
-            searchFocused 
-              ? 'border-pink-400 shadow-lg shadow-pink-500/20 bg-white/20' 
-              : 'border-white/20 hover:border-white/40'
-          }`}>
+        {/* <div className={`relative transition-all duration-500 ${searchFocused ? "w-96" : "w-80"}`}>
+          <div
+            className={`relative bg-white/10 backdrop-blur-xl rounded-2xl border transition-all duration-300 ${
+              searchFocused
+                ? "border-pink-400 shadow-lg shadow-pink-500/20 bg-white/20"
+                : "border-white/20 hover:border-white/40"
+            }`}
+          >
             <input
               type="text"
               placeholder="Search anything..."
@@ -74,17 +67,19 @@ const Topbar = () => {
               onBlur={() => setTimeout(() => setSearchFocused(false), 200)}
               className="w-full bg-transparent text-white placeholder-gray-300 px-6 py-4 pl-14 pr-20 focus:outline-none rounded-2xl"
             />
-            
-            <FaSearch className={`absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-300 ${
-              searchFocused ? 'text-pink-400 scale-110' : 'text-gray-300'
-            }`} />
+
+            <FaSearch
+              className={`absolute left-5 top-1/2 -translate-y-1/2 transition-all duration-300 ${
+                searchFocused ? "text-pink-400 scale-110" : "text-gray-300"
+              }`}
+            />
 
             <button
               onClick={handleVoiceSearch}
               className={`absolute right-12 top-1/2 -translate-y-1/2 p-2 rounded-full transition-all duration-300 ${
-                isListening 
-                  ? 'bg-red-500 text-white animate-pulse' 
-                  : 'text-gray-300 hover:text-pink-400 hover:bg-white/10'
+                isListening
+                  ? "bg-red-500 text-white animate-pulse"
+                  : "text-gray-300 hover:text-pink-400 hover:bg-white/10"
               }`}
             >
               <FaMicrophone />
@@ -98,25 +93,15 @@ const Topbar = () => {
                 <FaTimes />
               </button>
             )}
-            
-            {searchFocused && (
-              <div className="absolute top-full left-0 right-0 mt-2 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 overflow-hidden animate-in slide-in-from-top-2 duration-300 z-50">
-                {['Recent searches', 'Popular topics', 'Trending now'].map((item, i) => (
-                  <div key={i} className="px-6 py-3 hover:bg-purple-100 cursor-pointer transition-colors text-gray-700 border-b border-gray-100 last:border-0">
-                    {item}
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
-        </div>
+        </div> */}
       </div>
 
-      {/* Right section */}
+      {/* Right Section */}
       <div className="flex items-center gap-6 z-10">
-        {/* Time */}
+        {/* Clock */}
         <div className="text-white/80 text-sm font-mono bg-white/10 px-4 py-2 rounded-lg backdrop-blur">
-          {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
         </div>
 
         {/* Notifications */}
@@ -128,23 +113,6 @@ const Topbar = () => {
                 {notificationCount}
               </div>
             )}
-          </div>
-          
-          <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-xl rounded-xl shadow-2xl border border-white/20 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform translate-y-2 group-hover:translate-y-0 z-50">
-            <div className="p-4">
-              <h3 className="font-semibold text-gray-800 mb-3">Notifications</h3>
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-center gap-3 p-3 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors">
-                  <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                    {i}
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">New message received</p>
-                    <p className="text-xs text-gray-500">2 minutes ago</p>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -175,11 +143,15 @@ const Topbar = () => {
                 </div>
               </div>
               <div className="space-y-2">
-                {['Profile', 'Settings', 'Help', 'Sign Out'].map((item, i) => (
-                  <div key={i} className="px-4 py-2 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors text-gray-700">
-                    {item}
-                  </div>
-                ))}
+                {/* <div className="px-4 py-2 hover:bg-purple-50 rounded-lg cursor-pointer text-gray-700">Profile</div>
+                <div className="px-4 py-2 hover:bg-purple-50 rounded-lg cursor-pointer text-gray-700">Settings</div>
+                <div className="px-4 py-2 hover:bg-purple-50 rounded-lg cursor-pointer text-gray-700">Help</div> */}
+                <div
+                  onClick={handleSignOut}
+                  className="px-4 py-2 hover:bg-red-50 rounded-lg cursor-pointer text-red-600 font-semibold"
+                >
+                  Sign Out
+                </div>
               </div>
             </div>
           </div>

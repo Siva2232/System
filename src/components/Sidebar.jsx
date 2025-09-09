@@ -10,6 +10,7 @@ import {
   FaUserCircle,
   FaBed,
   FaSignOutAlt,
+  FaFileInvoiceDollar,
 } from "react-icons/fa";
 
 const Sidebar = () => {
@@ -44,6 +45,13 @@ const Sidebar = () => {
       label: "New Booking",
       icon: <FaPlus />,
       gradient: "from-orange-500 to-red-600",
+      count: null,
+    },
+    {
+      path: "/crm/bill",
+      label: "Invoice Bill",
+      icon: <FaFileInvoiceDollar />,
+      gradient: "from-yellow-500 to-amber-600",
       count: null,
     },
     {
